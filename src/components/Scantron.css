@@ -1,0 +1,9 @@
+.full-scantron {
+  display: flex;
+  justify-content: space-around;
+}
+
+.scantron-col {
+  padding: 10px;
+  justify-content: center;
+}
