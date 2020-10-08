@@ -5,24 +5,32 @@ import Button from '@material-ui/core/Button';
 import Modal from './Modal';
 import Portal from './Portal';
 
-const MAX_PER_COL = 25
 
 class Scantron extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      scantronAnswers: [],
+      scantron: [],
       modal: false
     }
   }
 
   componentDidMount() {
+
     const { questions } = this.props;
 
-    let scantronAnswers = Array.from({length: questions }).map(() => '')
+    const scantron = this.createScantron(questions)
 
-    this.setState({ scantronAnswers })
+    this.setState({ scantron })
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (prevProps !== this.props) {
+      const scantron = this.createScantron(this.props.questions)
+
+      this.setState({ scantron })
+    }
   }
 
   toggleModal = () => {
@@ -33,49 +41,44 @@ class Scantron extends Component {
   createScantron = (questions) => {
 
     var result = []
-    let numberOfBreaks = Math.floor(questions/MAX_PER_COL)
-    let numForEachCol = Math.floor(questions/numberOfBreaks)
-    let qNum = 1;
 
-    for (var i = 0; i < numberOfBreaks; i++) {
-      let subArr = [];
-      for (var j = 0; j < numForEachCol; j++) {
-        subArr.push({ qNum, answer: null })
-        qNum++
-      }
 
-      if (i === numberOfBreaks - 1 && qNum <= questions) {
-        while (qNum <= questions) {
-          subArr.push({ qNum, answer: null })
-          qNum++
-        }
-      }
-
-      result.push(subArr)
-
+    for (var i = 0; i < questions; i++) {
+      result.push({ qNum: i + 1, answer: null, correctAnswer: null })
     }
 
     return result
   }
 
   selectAnswer = (i, answer) => {
-    let answerBank = this.state.scantronAnswers.slice();
+    let scantron = this.state.scantron.slice();
 
-    answerBank[i] = answer;
+    scantron[i].answer = answer;
 
-    this.setState({ scantronAnswers: answerBank })
+    this.setState({ scantron })
+  }
+
+  checkCorrect = (i, answer) => {
+    let scantron = this.state.scantron.slice();
+
+    scantron[i].correctAnswer = answer
+
+    this.setState({ scantron })
   }
 
   render() {
 
     const { questions } = this.props;
-    const { scantronAnswers, modal } = this.state;
+    const { scantronAnswers, modal, scantron } = this.state;
+
+    if (!scantron) return <div>Loading...</div>
+    const columns = Math.ceil(questions/25)
 
     return (
       <div>
         Total # of questions: {questions}
         <Button onClick={this.toggleModal} color='primary'>Get Results</Button>
-        <div className='full-scantron'>
+        <div style={{columnCount: columns}}>
           {
             modal && (
               <Portal>
@@ -83,25 +86,19 @@ class Scantron extends Component {
                   toggle={this.toggleModal}
                   numQuestions={questions}
                   createScantronAnswer={this.createScantron}
-                  enteredAnswers={scantronAnswers}
+                  scantron={scantron}
+                  columns={columns}
+                  checkCorrect={this.checkCorrect}
                 />
               </Portal>
             )
           }
           {
-            this.createScantron(questions).map((questionCol, col) => (
-              <div className='scantron-col'>
-                {
-                  questionCol.map((q, i) => {
-                    return (
-                      <Question
-                        num={q.qNum}
-                        selectAnswer={this.selectAnswer}
-                      />
-                    )
-                  })
-                }
-              </div>
+            scantron.map((question, col) => (
+                <Question
+                  question={question}
+                  selectAnswer={this.selectAnswer}
+                />
             ))
           }
         </div>

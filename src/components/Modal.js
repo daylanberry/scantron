@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import './Modal.css';
 import TextField from '@material-ui/core/TextField';
+import Button from '@material-ui/core/Button';
 
 
 class Modal extends Component {
@@ -9,7 +10,6 @@ class Modal extends Component {
 
     this.state = {
       correctAnswers: Array.from({ length: this.props.numQuestions }).map(() => ''),
-      enteredAnswers: this.props.enteredAnswers
     }
   }
 
@@ -31,49 +31,72 @@ class Modal extends Component {
 
 
   createAnswerBank = () => {
-    const { numQuestions, createScantronAnswer } = this.props;
+    const { scantron } = this.props;
     const { correctAnswers } = this.state;
 
-    const toRender = createScantronAnswer(numQuestions)
 
-    return toRender.map((col, i) => (
-      <div >
-        {
-          col.map((entry, idx) => (
-            <div>
-              <span style={{color: 'white'}}>
-                {entry.qNum}
-              </span>
-              <TextField
-                id='outlined-basic'
-                type='text'
-                style={{color: 'blue'}}
-                onChange={(e) => {
-                  this.setCorrectAnswer(e.target.value.slice(-1), entry.qNum - 1)
-                }}
-                value={correctAnswers[entry.qNum-1]}
-              />
-            </div>
-          ))
-        }
+    return scantron.map((question, i) => (
+      <div>
+        <span style={{color: 'white'}}>
+          {question.qNum}
+        </span>
+        <TextField
+          type='text'
+          id='outlined-basic'
+          style={{color: 'blue'}}
+          onChange={(e) => {
+            e.target.value.slice(-1)
+            this.setCorrectAnswer(e.target.value.slice(-1), question.qNum - 1)
+          }}
+          value={correctAnswers[question.qNum -1]}
+        />
       </div>
     ))
 
   }
 
+  calculateAnswers = () => {
+    const { correctAnswers } = this.state;
+    const { scantron, checkCorrect, toggle } = this.props
+
+    for (var i = 0; i < correctAnswers.length; i++) {
+      if (!scantron[i].answer || !correctAnswers[i]) continue
+      if (scantron[i].answer === correctAnswers[i]) {
+        checkCorrect(i, correctAnswers[i])
+      } else {
+        checkCorrect(i, correctAnswers[i])
+      }
+    }
+
+    toggle()
+  }
+
   render() {
-    const { toggle } = this.props
+    const { toggle, columns } = this.props
 
     return (
       <div className='modal'>
         <div style={{height: '100%'}}>
           <div className='answer-title'>
             <h1 style={{color: 'aliceblue'}}>Fill out the answers</h1>
+            <div>
+              <Button
+                variant='contained'
+                color='primary'
+                style={{
+                  marginTop: '22px',
+                  marginLeft: '10px'
+                }}
+                onClick={this.calculateAnswers}
+              >
+                Get Results
+              </Button>
+            </div>
             <div onClick={toggle} className='close'></div>
           </div>
 
           <form autoComplete='off'>
-            <div style={{display: 'flex'}}>
+            <div style={{columnCount: columns}}>
               {this.createAnswerBank()}
             </div>
           </form>

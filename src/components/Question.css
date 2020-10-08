@@ -1,4 +1,12 @@
 .question {
   display: flex;
-  justify-content: space-around;
+  justify-content: center;
+  -webkit-column-break-inside: avoid;
+  page-break-inside: avoid;
+  break-inside: avoid;
+}
+
+.incorrect {
+  color: red;
+  margin-left: 10px;
 }
