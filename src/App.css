@@ -2,6 +2,11 @@
   text-align: center;
 }
 
+html {
+  overflow-x: hidden;
+  width: 100vw;
+}
+
 .App-logo {
   height: 40vmin;
   pointer-events: none;
@@ -41,3 +46,6 @@
   padding-right: 10px;
   margin-top: 20px;
 }
+
+
+

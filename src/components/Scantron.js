@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import Question from './Question';
 import './Scantron.css';
 import Button from '@material-ui/core/Button';
+import Modal from './Modal';
+import Portal from './Portal';
 
 const MAX_PER_COL = 25
 
@@ -10,16 +12,21 @@ class Scantron extends Component {
     super(props);
 
     this.state = {
-      scantronAnswers: []
+      scantronAnswers: [],
+      modal: false
     }
   }
 
   componentDidMount() {
     const { questions } = this.props;
 
-    let scantronAnswers = Array.from({length: questions })
+    let scantronAnswers = Array.from({length: questions }).map(() => '')
 
     this.setState({ scantronAnswers })
+  }
+
+  toggleModal = () => {
+    this.setState({ modal: !this.state.modal});
   }
 
 
@@ -61,13 +68,26 @@ class Scantron extends Component {
 
   render() {
 
-    const { questions, scantron } = this.props;
+    const { questions } = this.props;
+    const { scantronAnswers, modal } = this.state;
 
     return (
       <div>
         Total # of questions: {questions}
-        <Button color='primary'>Get Results</Button>
+        <Button onClick={this.toggleModal} color='primary'>Get Results</Button>
         <div className='full-scantron'>
+          {
+            modal && (
+              <Portal>
+                <Modal
+                  toggle={this.toggleModal}
+                  numQuestions={questions}
+                  createScantronAnswer={this.createScantron}
+                  enteredAnswers={scantronAnswers}
+                />
+              </Portal>
+            )
+          }
           {
             this.createScantron(questions).map((questionCol, col) => (
               <div className='scantron-col'>

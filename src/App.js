@@ -42,7 +42,6 @@ class App extends Component {
     return (
       <div className="App">
         <h3>Take your practice test here!</h3>
-
         <form onSubmit={this.submitNumber}>
           <label className='label'>
             Change number of questions (default 50)
