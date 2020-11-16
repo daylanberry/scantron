@@ -5,7 +5,7 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 import './Question.css'
 
 
-const Question = ({ question: { qNum, correctAnswer, answer }, selectAnswer })=> {
+const Question = ({ question: { qNum, correctAnswer, answer }, selectAnswer, show })=> {
 
   const renderOptions = () => {
     let options = ['A', 'B', 'C', 'D']
@@ -26,7 +26,7 @@ const Question = ({ question: { qNum, correctAnswer, answer }, selectAnswer })=>
           })
         }
         {
-          correctAnswer && answer !== correctAnswer ? (
+          correctAnswer && show && answer !== correctAnswer ? (
             <span className='incorrect'>Correct Answer: {correctAnswer}</span>
           ): null
         }

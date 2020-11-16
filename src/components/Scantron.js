@@ -12,7 +12,8 @@ class Scantron extends Component {
 
     this.state = {
       scantron: [],
-      modal: false
+      modal: false,
+      show: false
     }
   }
 
@@ -71,7 +72,9 @@ class Scantron extends Component {
     this.setState({ scantron })
   }
 
-
+  showAnswers = () => {
+    this.setState({show: !this.state.show})
+  }
 
   clearCorrectAnswers = () => {
     let scantron = this.state.scantron.slice();
@@ -86,7 +89,7 @@ class Scantron extends Component {
   render() {
 
     const { questions } = this.props;
-    const { modal, scantron } = this.state;
+    const { modal, scantron, show } = this.state;
 
     if (!scantron) return <div>Loading...</div>
     const columns = Math.ceil(questions/25)
@@ -95,6 +98,11 @@ class Scantron extends Component {
       <div>
         Total # of questions: {questions}
         <Button onClick={this.toggleModal} color='primary'>Get Results</Button>
+        <Button
+          onClick={this.showAnswers}
+        >
+          Show Answers
+        </Button>
         <Button
           onClick={this.clearCorrectAnswers}
         >
@@ -121,6 +129,7 @@ class Scantron extends Component {
                 <Question
                   question={question}
                   selectAnswer={this.selectAnswer}
+                  show={show}
                 />
             ))
           }
