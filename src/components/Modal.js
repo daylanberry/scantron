@@ -13,6 +13,19 @@ class Modal extends Component {
     }
   }
 
+  componentDidMount() {
+
+    let correctAnswers = JSON.parse(window.localStorage.getItem('correct'));
+
+    if (correctAnswers) {
+      this.setState({correctAnswers})
+    } else {
+      this.setState({
+        correctAnswers: Array.from({ length: this.props.numQuestions}).map(() => '')
+      })
+    }
+  }
+
   setCorrectAnswer = (answer, idx) => {
     if (!answer || !answer.length) return
 
@@ -57,15 +70,23 @@ class Modal extends Component {
 
   calculateAnswers = () => {
     const { correctAnswers } = this.state;
-    const { scantron, checkCorrect, toggle } = this.props
+    const { scantron, checkCorrect, toggle, saveCorrectAnswers } = this.props
 
     for (var i = 0; i < correctAnswers.length; i++) {
-      if (!scantron[i].answer || !correctAnswers[i]) continue
+      // if (!scantron[i].answer || !correctAnswers[i]) continue
       if (scantron[i].answer === correctAnswers[i]) {
         checkCorrect(i, correctAnswers[i])
       } else {
         checkCorrect(i, correctAnswers[i])
       }
+    }
+
+
+    if (scantron.filter(answer => answer.correctAnswer).length === scantron.length){
+
+      let storageAnswers = JSON.stringify(scantron.map(q => q.correctAnswer))
+
+      window.localStorage.setItem('correct', storageAnswers)
     }
 
     toggle()
